@@ -32,7 +32,7 @@ login_manager.init_app(app)
 oauth = OAuth(app)
 auth0 = oauth.register(
     'auth0',
-    client_id='RByXpzargl0vi7A197IYLZWrjiMRD6k1',
+    client_id='',
     client_secret='',
     api_base_url=f'https://dev-ide3i4bsx5n6mct1.us.auth0.com',
     access_token_url=f'https://dev-ide3i4bsx5n6mct1.us.auth0.com/oauth/token',
