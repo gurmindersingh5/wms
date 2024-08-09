@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Customer sales data{% endblock %}
+
+{% block content %}
+<!-- Bootstrap Container -->
+<div class="container mt-4">
+    <!-- Invoice Header -->
+    <div class="bg-white p-3 rounded border">
+        <div class="text-success mb-3">
+            <h4>Party Name: {{ cust_data.name }}</h4>
+            <p class="mb-1">{{ cust_data.address }}</p>
+            <p class="mb-1">{{ cust_data.contact }}</p>
+        </div>
+    </div>
+
+    <!-- Purchased Data -->
+    <div class="bg-white p-3 rounded border mt-3">
+        <ul class="list-unstyled">
+            {% for invoice_no, items in purchased_data.items() %}
+            <li class="mb-3 text-success">
+                {{ invoice_no }} 
+                <a class="text-dark ml-2">Invoice Total: {{ invoice_totals[invoice_no] }}</a>
+                <button class="btn btn-danger btn-sm float-right del_btns" value="{{ invoice_no }}">Clear Record</button>
+            </li>
+            <table class="table table-bordered table-striped">
+                <thead class="thead-light">
+                    <tr>
+                        <th>S.No</th>
+                        <th>Description of Goods</th>
+                        <th class="text-right">Qty (CTN)</th>
+                        <th class="text-right">Qty (PCs)</th>
+                        <th class="text-right">Total</th>
+                        <th class="text-right">Dated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ partlist[item.part_id] }}</td>
+                        <td class="text-right">{{ item.container_qty }}</td>
+                        <td class="text-right">{{ item.pieces_qty }}</td>
+                        <td class="text-right">{{ item.price }}</td>
+                        <td class="text-right">{{ item.time }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Total Display -->
+    <div class="d-flex justify-content-end mt-4">
+        <p class="text-success font-weight-bold mr-4">Total: {{ total }}</p>
+    </div>
+    <div class="d-flex justify-content-end">
+        <p id="tot_reload" class="text-dark font-weight-bold"></p>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    // Select all delete buttons by class name
+    var deleteBtns = document.querySelectorAll('.del_btns');
+
+    // Add event listener to each delete button
+    deleteBtns.forEach(function(button) {
+        button.addEventListener('click', function() {
+            if (confirm('Accept ?')) {
+                // Get the invoice number from the value attribute of the clicked button
+                var invoiceNo = button.value;
+                
+                // Perform an AJAX request to delete the corresponding entry
+                fetch('/delete_invoice', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ invoiceNo: invoiceNo })
+                })
+                .then(response => {
+                    // Check if the response is successful
+                    if (response.ok) {
+                        // Remove the parent li element (the entire invoice entry) from the DOM
+                        button.textContent = 'Deleted';
+                        button.disabled = true;
+                        button.parentElement.style.textDecoration = 'line-through';
+                        document.getElementById('tot_reload').textContent = 'Total might have changed, refresh the page';
+                    } else {
+                        // Handle the error accordingly
+                        console.error('Failed to delete entry');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

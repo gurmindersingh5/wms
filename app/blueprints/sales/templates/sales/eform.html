@@ -1,0 +1,959 @@
+{% extends 'base.html' %}
+
+{% block title %}New Entry{% endblock %}
+
+{% block content %}
+<style>
+#eform {
+  color: white;
+  background-color:  rgb(85, 85, 85);
+}
+/* Define the animation */
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Apply the animation to the element */
+.animated-div {
+  background-color: rgba(255, 255, 0, 0.347);
+  display: none;
+  position:relative;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  animation: slideInFromLeft 0.5s ease-in-out forwards; /* Adjust the duration and timing function as needed */
+}
+
+#orderlist td{
+  font-size: 16px;
+}
+
+.customer-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    z-index: 1;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    max-height: 200px;
+    overflow-y: auto;
+    width: auto;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    border-radius: 4px;
+}
+
+.customer-list li {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.customer-list li:hover {
+    background-color: #ddd;
+}
+
+.submit_print {
+  background: linear-gradient( #80aaf876, #a2ddfa7e);
+  font-size: 18px;
+  width: auto;
+  height: 28px; 
+  color: black; 
+  border-radius: 5px; 
+  padding: 1px 5px 1px 5px; 
+  margin-top: 30px;
+  position: relative;
+  margin-left: 10px;
+  display: none;  
+  transition: transform 0.1s, box-shadow 0.2s;
+  border: 1px dotted gray;
+  cursor: pointer;
+}
+
+.submit_print:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+.revieworder{
+  font-size: 18px;
+  margin-right: 10px;
+  width: 150px;
+  height: 28px; 
+  color: black; 
+  background: linear-gradient( lightgreen, white); 
+  border-radius: 5px; 
+  padding: 1px 1px 1px 1px; 
+  margin-top: 30px;
+  position: relative;
+  display: none;  
+  transition: transform 0.1s, box-shadow 0.2s;
+  border: 1px dotted gray;
+  cursor: pointer;
+}
+
+.revieworder:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+.undo{
+  font-size: 18px; 
+  width: 100px; 
+  color: black; 
+  background: linear-gradient(rgb(243, 164, 108), white); 
+  padding: 1px 1px 1px 1px; 
+  margin-right: 0px;
+  text-align: center;
+}
+.undo:hover{
+  background: linear-gradient(rgb(166, 112, 74), white); 
+}
+
+.focused {
+  background-color: lightblue;
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.notification-holder {
+  display: flex;
+  justify-content: center; /* Horizontally center */
+  align-items: center; /* Vertically center */
+  height: 100%; /* Ensure the container takes full height */
+  padding-bottom: 2px;
+}
+
+#notification {
+  display: none;
+  padding: 4px 10px 4px 10px;
+  /* background-color: rgba(35, 209, 35, 0.5); */
+  width: auto;
+  color: black;
+  margin: 0px 0px 2px 0px;
+  border-radius: 5px;
+  text-align: center;
+  position: relative;
+  font-size: 18px;
+  animation: slideIn 0.5s forwards;
+}
+
+.total_div {
+  display: none;
+  text-align: right;
+  position: relative;
+  color: blue;
+  font-size: 20px;
+  font-weight: bold;
+  height: 30px;
+  width: auto;
+  padding: 2px 5px 0px 0px;
+}
+
+/* Modal Styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1000; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Dim background */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #333; /* Spinner color */
+  border-radius: 50%;
+  left: 48%;
+  position: relative;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite; /* Animation */
+}
+
+/* Animation for spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.orderlist-table {
+  line-height: 1.6;
+}
+</style>
+
+<div class="notification-holder">
+  <div id="notification" >
+  </div>
+</div>
+
+<div class="d-flex justify-content-between w-100">
+  <div class="w-100" style="background-color:white; margin: 0px; padding-top: 0px; border-radius: 15px;" >
+    <div class="left-align w-100" style="padding-bottom: 0px; background:rgba(211, 211, 211, 0.6); border-radius: 10px;">
+      <div style="display: flex;" >
+        <div style="margin-left:1px;"  >
+            <td class="editables w-100">
+              <input type="text" id="searchCustomer" class="form-control w-100 m-2" autocomplete="off" placeholder="Search for a customer...">
+              <ul id="customerList" class="customer-list"></ul>
+            </td>
+            <a id="displayCustomer" style="font-size: 18px; font-weight: bold;"></a>
+        </div>
+      </div>
+      
+    <div class="w-100 d-flex justify-content-center">
+      <table class="table" style="background: rgba(211, 211, 211, 0.6);">
+          <thead>
+              <tr>
+                  <th style="font-size: 14px; font-weight: bold; width: 50%">Parts</th>
+                  <th style="font-size: 14px; font-weight: bold; text-align: center; width: 15%">Qty(CTN)</th>
+                  <th style="font-size: 14px; font-weight: bold; text-align: center; width: 15%">Qty(PCs)</th>
+                  <th style="font-size: 14px; font-weight: bold; text-align: center; width: 20%">Price/Item</th>
+              </tr>
+          </thead>  
+          <tbody>
+              <tr>
+                  <td class="editables">
+                      <input type="text" id="searchPart" class="form-control w-100" autocomplete="off" placeholder="Search for Part...">
+                      <ul id="partList" class="customer-list"></ul>
+                  </td>
+                  <td class="editables" id="container_qty">
+                      <input id="container_qty_input" class="form-control w-100" type="number">
+                  </td>
+                  <td class="editables" id="pieces_qty">
+                      <input id="pieces_qty_input" class="form-control w-100" type="number">
+                  </td>
+                  <td class="editables">
+                      <input id="price-input" class="form-control w-100" type="number">
+                  </td>
+              </tr>
+          </tbody>
+      </table>
+    </div>
+
+        <input type="hidden" id="hiddenInpPartId" name="part_id" value="">
+        <input type="hidden" id="hiddenInpPart" name="Parts_purchased" value="">
+        <input type="hidden" id="hiddenInpPrice" name="Price" value="">
+        <input type="hidden" id="hiddenInpId" name="cust_id" value="">
+        <div id="submit_div" style="margin-left:15px; margin-top:5px;">
+        </div> 
+    </div>
+
+    <div style="text-align: right; justify-self: right; background:linear-gradient(white, lightgray, white) ; padding: 10px 10px 5px 5px; align-items:center" class="w-100 bg-primary">
+        <button id="delete_row_btn" class="undo" style="border-right: 0px; border-bottom-left-radius: 4px; border-top-left-radius: 4px;">
+          Delete
+        </button><input id="delete_input" class="undo" style=" background: white; border-left: 0px; margin-right: 2px; padding-right: 3px; " placeholder=" Enter S.No. " > 
+    </div>
+    <div id="orderlistdiv" class="animated-div" style="display: none; color: teal; font-size: 16px; font-weight: bold;">
+      Order List
+    </div>
+    <table id="orderlisttable">
+    </table>
+
+    <div class="w-100 justify-content-center d-flex">
+    <table id="orderlist" class="mt-2 w-100">
+      <thead style="color:rgb(92, 89, 89);">
+        <tr>
+          <th style="font-size: 14px; width:5%; font-weight: bold; ">S.No</th>
+          <th style="font-size: 14px; width:5%; font-weight: bold; ">ID</th>
+          <th style="font-size: 14px; width:70%; font-weight: bold; ">Part</th>
+          <th style="font-size: 14px; width:5%; font-weight: bold; text-align: right;">CTNs</th>
+          <th style="font-size: 14px; width:5%; font-weight: bold; text-align: right;">PCs</th>
+          <th style="font-size: 14px; width:10%; font-weight: bold; text-align: right; padding-right: 5px;">Price/Item</th>
+          <th style="font-size: 14px; width:10%; font-weight: bold; text-align: right;">Total</th>
+        </tr>
+      </thead>
+    </table>
+    </div>
+    <div style="display: flex; align-items: center; justify-content: flex-end;"><div id="currenttotal" class="total_div">Current Total: </div><div id="total_div" class="total_div"></div>
+    </div>
+    <div style="display: flex; align-items: center; justify-content:center;"><button id="revieworder" onmousedown="reviewOrder()" class="revieworder" >Review order</button> <button id="submitentry" onmouseup="submitEntryandPrint()" class="submit_print" >Submit Entry and Print</button> 
+    </div>
+    <div class="div_note" style="color: red;">{{err_msg}}</div>
+  </div>
+  <!-- Modal -->
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <div class="spinner"></div>
+      <p id="successMessage">Transaction Successful. Redirecting to print...</p>
+    </div>
+  </div>
+</div>
+
+<script>
+var capacity;
+var selected_part_id;
+var parts;
+var selectedCustomer;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Fetch capacity
+    fetch('/get_capacity')
+      .then(response => response.json())
+      .then(data => {
+        console.log(data); // Log the received data
+        capacity = data.cap;
+        console.log(capacity); // Log the assigned value of capacity
+      })
+      .catch(error => console.error('Error fetching capacity:', error));
+
+// CUSTOMER SEARCH BOX SCRIPT ////////////////////////////////////////////////////////////////////////////////////
+
+            // Variables
+            var selected_customer_id;
+            var customers;
+            var currentIndex = -1;
+            // var parts;
+            var items;
+            var filterCustomers; 
+            const partList = document.getElementById('partList');  
+            let isCustomerSearchActive = '0';
+            let isPartSearchActive = '0';
+
+            const searchInput = document.getElementById('searchCustomer'); //search box 
+            // searchInput.focus();
+            const searchInput_part = document.getElementById('searchPart');
+            // Fetch customers
+            fetch('/get_customers')
+              .then(response => response.json())
+              .then(data => {
+                customers = data.cust;
+              })
+              .catch(error => console.error('Error fetching customers:', error));
+
+
+            // Search input and customer list
+            const customerList = document.getElementById('customerList'); // 'ul' (contains'li' of listed customers)
+
+            
+
+            searchInput.addEventListener('focus', ()=>{
+              partList.innerHTML = '';
+              isCustomerSearchActive = '1';
+              isPartSearchActive = '0';
+            })
+
+            // Event listener for input changes
+            searchInput.addEventListener('input', function() {
+              const inputValue = searchInput.value.toLowerCase().trim();
+              filteredCustomers = filterCustomers(inputValue);
+              displayCustomers(filteredCustomers);
+                  items = document.querySelectorAll('#customerList li');                     
+                });
+
+              // Event listener for keyboard navigation
+              document.addEventListener('keydown', function(event) {
+              if (isCustomerSearchActive == '1'){
+                const key = event.key;
+                  const maxIndex = items.length - 1;
+                  // Navigate to the previous item
+                  if (key === 'ArrowUp' && currentIndex > 0) {
+                      currentIndex--;
+                      
+                  }
+                  // Navigate to the next item
+                  else if (key === 'ArrowDown' && currentIndex < maxIndex) {
+                      currentIndex++;
+                      
+                  }
+                  else if (key === 'Escape') {
+                      // Clear customer list
+                      customerList.innerHTML = '';
+                      // searchInput.value = '';
+                      return;
+                  }
+                  else if (key === 'Enter' && currentIndex > -1) {
+                      selectedCustomer = filteredCustomers[currentIndex];
+                      console.log('selectedCustomer ---- : ', selectedCustomer.value);
+                      searchInput.value = selectedCustomer.name;
+                      selected_customer = selectedCustomer.id;
+                      customerList.innerHTML = '';
+
+
+                      let formattedString = `<span style="color: blue; font-weight: bold;" class="ml-2" >Party name:</span> ${selectedCustomer.name},&nbsp${selectedCustomer.address}`;
+                      document.getElementById('displayCustomer').innerHTML = formattedString;
+                      if (selectedCustomer.value !== ''){
+                        searchInput_part.focus();
+                      }
+                      isCustomerSearchActive = '0'
+                    }
+                  
+              
+                  // Remove focus from all items
+                  // console.log('here ---------------------> after:', document.querySelectorAll('#customerList li'))
+
+                  document.querySelectorAll('#customerList li').forEach(item => {
+                      item.classList.remove('focused');
+                  });
+
+                  // Add focus to the new item
+                  // const items = document.querySelectorAll('#customerList li');
+                  // console.log('in event listener for KEYDOWN', currentIndex)
+
+                  items[currentIndex].classList.add('focused');
+
+                  // Scroll to the focused item if needed
+                  items[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }; //if end        
+              });
+              // if ends
+
+
+
+            // Function to filter customers
+            function filterCustomers(inputValue) {
+              return customers.filter(customer => customer.name.toLowerCase().includes(inputValue));
+            }
+
+            // Function to display filtered customers
+            function displayCustomers(customers) {
+              customerList.innerHTML = '';
+              currentIndex = -1;
+
+              customers.forEach((customer, index) => {
+                const listItem = document.createElement('li');
+                listItem.style.width = '1000px';
+                listItem.style.height = '30px';
+                listItem.textContent = customer.name + ', ' + customer.address + ', ' + customer.contact;
+
+                listItem.addEventListener('click', function() {
+                  searchInput.value = customer.name;
+                  selected_customer_id = customer.id;
+                  customerList.innerHTML = '';
+
+                  let formattedString = `<span style="color: blue; font-weight: bold;">Party name:</span> ${customer.name},&nbsp${customer.address}`;
+                  document.getElementById('displayCustomer').innerHTML = formattedString;
+                });
+
+                customerList.appendChild(listItem);
+                // container.appendChild(customerList);
+              });
+            };
+// ------------------------------------CUSTOMER SEARCH BOX SCRIPT END --------------------------------------------
+
+
+// SEARCH PART SCRIPT ///////////////////////////////////////////////////////////////////////////////////////////
+
+          // Variables for parts
+              var currentIndex_parts = -1;
+              var items_parts;
+              var filteredParts;
+              var selected_part;
+
+              // Fetch parts
+              fetch('/get_parts')
+                  .then(response => response.json())
+                  .then(data => {
+                      parts = data.partlist;
+                      console.log('ooooooooooo', parts[0].price)
+                  })
+                  .catch(error => console.error('Error fetching parts:', error));
+              
+              searchInput_part.addEventListener('focus', ()=>{
+              
+              customerList.innerHTML = '';
+              isPartSearchActive = '1'
+              isCustomerSearchActive = '0'
+                
+            })
+              // Event listener for input changes
+              searchInput_part.addEventListener('input', function() {
+                  const inputValue = searchInput_part.value.toLowerCase().trim();
+                  filteredParts = filterParts(inputValue);
+                  displayParts(filteredParts);
+                  items_parts = document.querySelectorAll('#partList li');
+              });
+
+              // Event listener for keyboard navigation
+             // Event listener for keyboard navigation
+                        document.addEventListener('keydown', function(event) {
+                          if (isPartSearchActive === '1'){
+                            const key = event.key;
+                            const maxIndex = items_parts.length - 1;
+                   
+                            // Navigate to the previous item
+                            if (key === 'ArrowUp' && currentIndex_parts > 0) {
+                                currentIndex_parts--;
+                            }
+
+                            // Navigate to the next item
+                            else if (key === 'ArrowDown' && currentIndex_parts < maxIndex) {
+                                currentIndex_parts++;
+                            }
+
+                            else if (key === 'Escape') {
+                                // Clear part list
+                                partList.innerHTML = '';
+                                // searchInput_part.value = '';
+                                return;
+                            }
+                            else if (key === 'Enter' && currentIndex_parts > -1) {
+                              selectedPart = filteredParts[currentIndex_parts];
+                                console.log('selectedPart: ', selectedPart.id);
+                                searchInput_part.value = selectedPart.name;
+                                selected_part_id = selectedPart.id;
+                                partList.innerHTML = '';
+                             
+                                if (searchInput_part.value !== ''){
+                                  document.getElementById('price-input').value = selectedPart.price;
+
+                                          // //fetching price for selected part from server using POST request AJAX
+                                          // var price;
+                                          //         let xhr = new XMLHttpRequest();
+                                          //         xhr.open("POST", "/eform", true);
+
+                                          //         xhr.onload=function(){
+                                          //         price = JSON.parse(this.responseText)['price'];
+
+                                          //         // Updating hidden input Price
+                                          //         const hiddenInp_price = document.getElementById('hiddenInpPrice');
+                                          //         hiddenInp_price.value = price
+
+                                          //         document.getElementById('price-input').value = price;
+                                          //         // document.getElementById('price-input').textContent = price;
+
+                                          //         };
+
+                                          //         xhr.send(selected_part_id);
+                                  isPartSearchActive = '0';
+                                  document.querySelector('#container_qty input').focus();
+                                }                              }
+                            document.querySelectorAll('#partList li').forEach(item_part => {
+                                item_part.classList.remove('focused');
+                            });
+
+                            // Add focus to the new item
+                            // console.log('in event listener for KEYDOWN', currentIndex_parts)
+                            items_parts[currentIndex_parts].classList.add('focused');
+                            // Scroll to the focused item if needed
+                            items_parts[currentIndex_parts].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          };             
+                        });
+
+              // Function to filter parts
+              function filterParts(inputValue) {
+                  return parts.filter(part => part.name.toLowerCase().includes(inputValue));
+              }
+
+              // Function to display filtered parts
+              function displayParts(parts) {
+                  partList.innerHTML = '';
+                  currentIndex_parts = -1;
+
+                  parts.forEach((part, index) => {
+                      const listItem_parts = document.createElement('li');
+                      listItem_parts.style.width = '1000px';
+                      listItem_parts.style.height = '30px';
+                      listItem_parts.textContent = part.name;
+
+                      listItem_parts.addEventListener('click', function() {
+                          searchInput_part.value = part.name;
+                          selected_part_id = part.id;
+                          partList.innerHTML = '';
+                          // console.log('---------------------', part.price, selected_part_id, part)
+                          document.getElementById('price-input').value = part.price;
+                          selectedPart = part;
+                          isPartSearchActive = '0';
+                        document.querySelector('#container_qty input').focus();
+                          // Handle part selection logic here
+                      });
+
+                      partList.appendChild(listItem_parts);
+                  });
+              }
+
+
+      });   // listnr DOMContentLoaded ends here
+// console.log(selected_part_id)
+// Script for CTN input to move focus
+document.getElementById('container_qty_input').addEventListener('focus', ()=>{
+
+          document.addEventListener('keydown', function(event){
+            if (event.key === "Enter"){
+              if (document.getElementById('container_qty_input').value !== '' ){
+            document.getElementById('pieces_qty_input').focus()
+          }
+            }
+          })
+        })
+
+// Script for PCs input to move focus
+
+        document.getElementById('pieces_qty_input').addEventListener('focus', ()=>{
+          document.addEventListener('keydown', function(event){
+            if (event.key === "Enter"  && document.activeElement === document.getElementById('pieces_qty_input') && (document.getElementById('container_qty_input').value != 0 || document.getElementById('pieces_qty_input').value != 0)){
+              required_qty = parseInt(document.getElementById('container_qty_input').value) * capacity[selectedPart.id] + parseInt(document.getElementById('pieces_qty_input').value);
+              
+              for (let i = 0; i < parts.length; i++) {
+                        if (parts[i].id === selectedPart.id) {
+                          available_qty = parts[i].CTN * capacity[selectedPart.id] + parts[i].PCS;
+                            break; 
+                    }}
+
+                              
+            if (document.getElementById('pieces_qty_input').value !== '' && 
+              available_qty >= required_qty) {
+                  document.getElementById('price-input').focus();
+             } else {
+
+            if (document.getElementById('container_qty_input').value !== '' &&document.getElementById('pieces_qty_input').value !== ''){
+             document.getElementById('notification').textContent  = "Not Enough QTY. Available qty is: " + available_qty + ' ( CTN: ' + selectedPart.CTN + ', PCS: ' + selectedPart.PCS + ')' ;
+            document.getElementById('notification').style.display = 'block'
+            document.getElementById('notification').style.color = 'white'
+            document.getElementById('notification').style.backgroundColor = 'red'
+
+            // document.getElementById('searchPart').focus();
+            required_qty = 0;
+            available_qty = 0;
+            document.getElementById('container_qty_input').value = '';
+            document.getElementById('pieces_qty_input').value = '';
+            document.getElementById('container_qty_input').focus();
+
+
+            setTimeout(() => {
+                      document.getElementById('notification').style.display = 'none';
+                      document.getElementById('notification').textContent = '';
+                      document.getElementById('notification').style.backgroundColor = "transparent"
+                      document.getElementById('notification').style.color = 'black'
+
+                    }, 4500);
+            }
+          }
+            }
+          })
+        })
+
+        var orderList=[];
+        var total;
+        grand_total = 0;
+        var sno = 0;
+
+// Script TO ADD ENTRY INTO order list (PRICE EVENT LISTENER)
+
+        document.getElementById('price-input').addEventListener('focus', ()=>{
+          document.addEventListener('keydown', function(event){
+            if (event.key === "Enter"){
+              isPartSearchActive = false;
+              isCustomerSearchActive = false;
+              if (document.getElementById('price-input').value !== '' && document.activeElement === document.getElementById('price-input') &&
+                  document.getElementById('searchCustomer').value !== '' && document.getElementById('searchPart').value !== '' &&
+                  document.getElementById('container_qty_input').value !== '' && document.getElementById('pieces_qty_input').value !== ''){
+                
+// code to add to ORDER LIST HERE :
+              if (confirm('Accept ?')) {
+                for (let i = 0; i < parts.length; i++) {
+                        if (parts[i].id === selected_part_id) {
+                            
+                            parts[i].CTN -= parseInt(document.getElementById('container_qty_input').value);
+                            parts[i].PCS -= parseInt(document.getElementById('pieces_qty_input').value);
+
+                            break; 
+                    }}
+                  var part = document.getElementById('searchPart').value;
+                  var ctn = document.getElementById('container_qty_input').value;
+                  var pcs =  document.getElementById('pieces_qty_input').value;
+                  var price = document.getElementById('price-input').value;
+
+                  document.getElementById('orderlistdiv').style.display = "block"
+                  
+                  const existingIndex = orderList.findIndex(row => row[1] === selected_part_id);
+
+                  if (existingIndex !== -1) {
+                      orderList[existingIndex][3] += parseInt(ctn); 
+                      orderList[existingIndex][4] += parseInt(pcs);
+                      
+                      orderList[existingIndex][6] += ((parseInt(ctn) * capacity[selected_part_id] + parseInt(pcs)) * parseFloat(price));
+                      // orderList[existingIndex][6] = parseFloat(orderList[existingIndex][6]).toFixed(2);
+// EHNU SET KRNA TOTAL NU 2 DECIMAL PLACES TE. TOTAL CH ERROR AUNDA
+                      console.log('In -------> ', orderList[existingIndex])
+                  // grand_total += parseFloat(total);
+                  
+                      document.getElementById('notification').style.display = 'block';
+                      document.getElementById('notification').style.backgroundColor = "#FF1F1F";
+                      document.getElementById('notification').style.color = "white";
+                      document.getElementById('notification').textContent = "Attention! Duplicate entries' quantities have been merged with the existing record in the orderlist!!!";
+
+                    setTimeout(() => {
+                      document.getElementById('notification').style.display = 'none';
+                      document.getElementById('notification').textContent = '';
+                      document.getElementById('notification').style.backgroundColor = "transparent"
+
+                    }, 4500);
+
+                  } else {
+                    total = (parseInt(ctn) * capacity[selected_part_id] + parseInt(pcs)) * parseFloat(price);
+                    // total = total.toFixed(2);
+                  sno++;
+                      orderList.push([sno, selectedPart.id, part, parseInt(ctn), parseInt(pcs), price, total]);
+                 
+                  }
+                  createorderlist();
+              }
+                  document.getElementById('searchPart').value = '';
+                  document.getElementById('container_qty_input').value = '';
+                  document.getElementById('pieces_qty_input').value = '';
+                  document.getElementById('price-input').value = '';
+                  document.getElementById('searchPart').focus();
+              }
+          }
+          })          
+        })
+
+        function createorderlist(){
+        var table = document.getElementById('orderlist');  
+        table.classList.add('orderlist-table'); // Add table class
+        while (table.rows.length > 1) {
+              table.deleteRow(1);
+          }
+
+          orderList.forEach((tr, index) => {
+        var row_tr = document.createElement('tr');
+        if (index % 2 == 0) {
+            row_tr.style.backgroundColor = "white";
+        } else {
+            row_tr.style.backgroundColor = "#f5f5f5";
+        }
+        var sno_td = document.createElement('td');
+        var id_td = document.createElement('td');
+        var part_wala_td = document.createElement('td');
+        var ctn_qty_wala_td = document.createElement('td');
+        ctn_qty_wala_td.style.textAlign = 'right';
+        var pcs_qty_wala_td = document.createElement('td');
+        pcs_qty_wala_td.style.textAlign = 'right';
+        var price_wala_td = document.createElement('td');
+        price_wala_td.style.textAlign = 'right';
+        var total_td = document.createElement('td');
+        total_td.style.textAlign = 'right';
+
+        sno_td.textContent = index+1;
+        sno_td.value = index+1;
+        tr[0] = index+1;
+
+        id_td.textContent = tr[1];
+        id_td.value = tr[1];
+
+        part_wala_td.value = tr[2];
+        part_wala_td.textContent = tr[2];
+
+        ctn_qty_wala_td.value = tr[3];
+        ctn_qty_wala_td.textContent = tr[3];
+
+        pcs_qty_wala_td.value = tr[4];
+        pcs_qty_wala_td.textContent = tr[4];
+
+        price_wala_td.value = tr[5];
+        price_wala_td.textContent = tr[5];
+
+        total_td.textContent = tr[6]
+
+        row_tr.appendChild(sno_td);
+        row_tr.appendChild(id_td);
+        row_tr.appendChild(part_wala_td);
+        row_tr.appendChild(ctn_qty_wala_td);
+        row_tr.appendChild(pcs_qty_wala_td);
+        row_tr.appendChild(price_wala_td);
+        row_tr.appendChild(total_td);
+        
+            table.appendChild(row_tr);
+        
+      });
+      
+      grand_total = 0;
+      setTimeout(function(){
+      var r = table.getElementsByTagName('tr');
+        for (var i = 1; i < r.length; i++) {
+            var totalCell = r[i].getElementsByTagName('td')[6].textContent; // getting the value of total column from every row
+            grand_total += parseFloat(totalCell);
+            document.getElementById('currenttotal').style.display = 'block'
+            document.getElementById('total_div').style.display = 'block'
+            document.getElementById('total_div').textContent = grand_total;
+
+            document.getElementById('revieworder').style.display = 'block'
+            document.getElementById('submitentry').style.display = 'block'
+          };
+      },2000);
+        }
+
+        function deletefunction(){
+          var cnt = 0;
+
+          var rowIndexToDelete = parseInt(document.getElementById('delete_input').value);
+
+          // Find the index of the row with the specified sno in the orderList
+          const indexToRemove = orderList.findIndex(row => row[0] === rowIndexToDelete);
+
+          // If the row exists, remove it from the orderList
+          if (indexToRemove !== -1) {
+
+            deletedRow = orderList.splice(indexToRemove, 1);
+            
+            for (let i = 0; i < parts.length; i++) {
+              if (parts[i].id === deletedRow[0][1]) {
+
+                  parts[i].CTN += parseInt(deletedRow[0][3]);
+
+                  parts[i].PCS += parseInt(deletedRow[0][4]);
+
+                  break; 
+          }}
+          //   parts.forEach(item => {
+
+          //     if (item.id === deletedRow[0][0]){
+          //       item.CTN += deletedRow[0][3];
+          //       item.PCS += deletedRow[0][4];
+          //     }
+              
+          //   });
+            
+            createorderlist();  
+            document.getElementById('notification').textContent = "Successfully deleted";
+                document.getElementById('notification').style.display = 'block';
+                document.getElementById('notification').style.backgroundColor = 'green';
+                document.getElementById('notification').style.color = 'white';
+
+                      setTimeout(function(){
+
+                        document.getElementById('notification').textContent = '';
+                        document.getElementById('notification').style.display = 'none';
+                        document.getElementById('notification').style.backgroundColor = 'transparent';
+                        }, 2500);
+
+            cnt = 1;
+
+          } else {
+
+                if (cnt == 0){
+
+                document.getElementById('notification').textContent = "This entry does not exsist! Please select 'S.No.' from table you want to delete";
+                document.getElementById('notification').style.display = 'block';
+                document.getElementById('notification').style.backgroundColor = 'lightyellow';
+                document.getElementById('notification').style.color = 'black';
+
+                      setTimeout(function(){
+
+                        document.getElementById('notification').textContent = '';
+                        document.getElementById('notification').style.display = 'none';
+                        document.getElementById('notification').style.backgroundColor = 'transparent';
+                        }, 2500);
+                }
+          }
+        }
+
+        document.getElementById('delete_row_btn').addEventListener('click', function() {
+            deletefunction();
+            document.getElementById('delete_input').value  = '';
+
+            });
+
+          
+            function reviewOrder() {
+              const dataToSend = {
+            orderList: orderList,
+            customerData: selectedCustomer
+            
+        };
+        console.log('inside reviewORder ,', selectedCustomer)
+        const dataString = encodeURIComponent(JSON.stringify(dataToSend));
+        const baseUrl = '/revieworder'; // URL of the new tab HTML page
+        const url = `${baseUrl}?data=${dataString}`;
+                      window.open(url, '_blank');
+                  }
+    var current_total;
+    var dataToSend_print;
+
+        function submitEntryandPrint(){
+          if (confirm('Accept ?')) {
+
+        //   let isClickPending = false;
+
+        // document.getElementById('submitentry').addEventListener('mouseup', function(event) {
+        //     if (!isClickPending) {
+        //         isClickPending = true;
+        //         setTimeout(function() {
+        //             // Your button action code here
+        //             isClickPending = false;
+        //         }, 300); // Adjust the timeout value as needed
+        //     }
+        // });
+
+
+          const dataToSend = {
+            'customer' : selectedCustomer,
+            'order' : orderList
+          };
+
+          fetch('/eform', {
+          method: 'POST', 
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(dataToSend)
+          })
+          
+          // response recieved from server(routes.py) stated it's redirected and has the URL to be redirected
+          .then(response => {
+            console.log(response)
+            if (response.status == 200){
+              console.log('------------------> ', response.data)
+              // Show the modal with success message
+                function showSuccessMessage() {
+                  var modal = document.getElementById("myModal");
+                  modal.style.display = "block";
+                }
+
+          // Close the modal
+                function closeSuccessMessage() {
+                  var modal = document.getElementById("myModal");
+                  modal.style.display = "none";
+                }
+
+          dataToSend_print = {
+            'customer' : selectedCustomer,
+            'order' : orderList,
+            'id' : selectedCustomer.id
+          };
+          
+          // Simulate a delay for demonstration purposes (3 seconds)
+          setTimeout(function() {
+            closeSuccessMessage(); // Close the modal after 3 seconds
+
+// ----------------------------------------------------------------------------
+              
+                  const dataString = JSON.stringify(dataToSend_print);
+                  // Encode data for URL
+                  const encodedData = encodeURIComponent(dataString);
+                  // Open new tab with encoded data in query parameter
+                  window.location.href = `/printinvoice?data=${encodedData}`;
+                  // window.location.href = "/printinvoice"
+                }, 600);
+
+                // Call the function to show the success message
+                showSuccessMessage();
+                  }        
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });       
+              }                          
+            } 
+</script>
+{% endblock %}

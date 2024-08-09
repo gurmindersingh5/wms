@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Malwa Petrochemicals{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+      .nav-items-custom-css {
+        font-size: large;
+        background-color: transparent;
+        border-radius: 5px;
+        padding: 5px 12px 5px 12px !important;
+      }
+      .nav-items-custom-css:hover {
+        color: white !important;  /* Ensure the color change on hover */
+        background-color: rgb(85, 85, 85) !important; /* Optional: change background color on hover */
+      }
+      .navbar-nav .nav-link {
+        color: lightgray; /* Set default text color for links */
+      }
+      .navbar-nav .nav-link:hover {
+        color: white; /* Change text color on hover */
+      }
+      .outer-container {
+        display: flex;
+        justify-content: center;  /* Center horizontally */
+        align-items: flex-start;      /* Center vertically */
+        min-height: 100vh;            /* Full height of the viewport */
+      }       
+      .inner-container {
+          width: 90%;               /* Specific width for your inner container */
+          background-color: white;  /* Background color */
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow for styling */
+          padding: 0.5rem;            /* Padding for content inside */
+          border-radius: 8px;       /* Rounded corners */
+          padding-bottom: 80px;
+          min-height: 100vh;
+      }     
+      .profile-button {
+        background-color: transparent;
+        border: none;
+        color: white;
+        padding: 10px 15px 10px 15px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0px 10px;
+    }
+    .profile-icon {
+        width: 20px;
+        height: 20px;
+    }
+    .profile-button:hover {
+      color: white !important;  /* Ensure the color change on hover */
+      background-color: #3498db;
+      transition: background-color 0.3s;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .profile-icon, .logout-icon {
+        display: inline-block;
+        width: 1.5em;
+        height: 1.5em;
+        border: none;
+        border-radius: 50%; 
+        text-align: center;
+        line-height: 1.5em;
+    }
+    
+    .profile-icon i, .logout-icon i {
+        color: transparent; /* Hide the filled part of the icon */
+        -webkit-text-stroke: 1px gray; /* Add a thin border */
+    }
+</style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark px-3" style="background-color: rgb(40, 40, 40);">
+        <a class="navbar-brand p-0" href="#">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" width="auto" height="30" class="d-inline-block align-top" alt="Company Logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarid" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarid">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a id="home" class="nav-link mr-2 nav-items-custom-css" href="{{url_for('home.home')}}">Analytics</a>
+                </li>
+                <li class="nav-item">
+                    <a id="inventory" class="nav-link mr-2 nav-items-custom-css" href="{{url_for('inventory.inventory')}}">Inventory</a>
+                </li>
+                <li class="nav-item">
+                    <a id="customerlist" class="nav-link mr-2 nav-items-custom-css" href="{{url_for('customer.customerlist')}}">Customer Inquiry</a>
+                </li>
+                <li class="nav-item">
+                    <a id="eform" class="nav-link mr-2 nav-items-custom-css" href="{{url_for('sales.e_form')}}">Sales</a>
+                </li>
+                <li class="nav-item">
+                    <a id="cform" class="nav-link nav-items-custom-css" href="{{url_for('addcustomer.c_form')}}">Add Customer</a>
+                </li>
+
+                <li class="nav-item dropdown">
+                  <button class="profile-button nav-link " id="profileDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="fa fa-user"></i>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-right shadow-sm px-2 py-3 mb-5 bg-white rounded" aria-labelledby="profileDropdown">
+                      {% if current_user.is_authenticated %}
+                        <a class="dropdown-item" href="{{ url_for('login.get_user') }}">
+                            <span class="profile-icon">
+                              <i class="fas fa-user"></i>
+                            </span>
+                            Your Profile
+                        </a>
+                        <hr>
+                        <a class="dropdown-item" href="{{ url_for('login.logout') }}">
+                            <span class="logout-icon">
+                              <i class="fas fa-sign-out-alt"></i>
+                            </span>
+                            Logout
+                        </a>                  
+                      {% else %}
+                        <a class="dropdown-item" href="{{url_for('login.login')}}" >
+                            <span class="profile-icon">
+                              <i class="fas fa-user"></i>
+                            </span>
+                            Sign In
+                        </a>
+                      {% endif %}
+                  </div>
+              </li>
+
+            </ul>
+        </div>
+    </nav>
+    <div class="outer-container">
+      <div class="inner-container">
+          {% block content %}
+          {% endblock %}
+      </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Product{% endblock %}
+
+{% block content %}
+<div class="mt-4">
+  <form method="POST" id="pform" action="{{ url_for('addproduct.p_form') }}" style="color:navy" class="left-a" >
+    {{form.hidden_tag()}}
+    <div class="w-100 d-flex justify-content-center">
+      <div style="padding: 15px;" class="w-75">
+        <table id="editableTable"  style=" max-width: auto; min-width: 1050px; background-color: white; ">
+          <tr>
+            <td style="width: 200px; font-weight: bold; color: black;">Product Name: </td>
+            <td  class="editables" contenteditable="false" style=" padding: 2px;"> {{ form.name(style="font-size: 20px; width:600px; font-weight: normal; min-height:80px;") }}  
+            &nbsp; </td>
+          </tr>
+          <tr>
+            <td style="width: 200px; font-weight: bold; color:black;">Qty(CTN)</td>
+            <td id="ctn_qty" class="editables" contenteditable="false" style=" padding: 2px;">  {{form.container_qty(style="font-size: 20px; width:100px; min-height:35px; font-weight: normal;")}} &nbsp; <span style="color: red; display: none;" id="missing_field1">Please fill out this field !</span></td>
+          </tr>
+          <tr>
+              <td style="width: 200px; font-weight: bold; color:black;">Qty(PCs): :</td>
+              <td id="pcs_qty" class="editables" contenteditable="false" style=" padding: 2px;">  {{form.pieces_qty(style="font-size: 20px; width:100px; min-height:35px; font-weight: normal;")}} &nbsp; <span style="color: red; display: none;" id="missing_field2">Please fill out this field !</span> </td>
+          </tr>
+          <tr>
+              <td style="width: 200px; font-weight: bold; color:black;">Price/Item: </td>
+              <td class="editables" contenteditable="false" style=" padding: 2px;">  {{ form.price(style="font-size: 20px; width:150px; min-height:35px; font-weight: normal;") }}         </td>
+          </tr>
+          <tr>
+              <td style="width: 200px; font-weight: bold; color:black;">How many in 1 CTN: </td>
+              <td  class="editables" contenteditable="false" style=" padding: 2px;"> {{form.container_capacity(style="font-size: 20px; width: 100px; min-height:35px; font-weight:normal;")}}     </td>
+          </tr>
+        </table>
+      <div>
+    </div>
+    <div class="d-flex w-100 justify-content-center my-3">
+      {{ form.submit(class="btn btn-lg custom-class", id="submit",  style="color: white; background-color: rgb(50, 206, 107); height:40px; width:180px; font-size:18px; border-radius: 5px; border: 2px solid gray; border-left-width: 10px; border-right-width: 10px; cursor: pointer;  ", onmousedown="this.style.backgroundColor='rgb(15, 173, 73)'", onmouseleave="this.style.backgroundColor='rgb(50, 206, 107)'") }}
+    </div>
+  </form>
+  <div style="display: flex; justify-content: center; align-items: center; margin-top: 30px;">
+    <div id="div_note" class="div-note" style="text-align: center;">
+        <a style="color: black;">Last entry:- &nbsp;</a>
+        <a>{{note[0]}}</a> priced at <a>₹ {{note[1]}}</a> was saved in the Inventory. Dated: <a>{{note[2]}}</a>
+    </div>
+</div>
+
+<script src="/flask_pkg/static/js/div-note.js"></script>
+<script src="{{ url_for('static', filename='js/jquery-3.6.4.min.js') }}"></script>
+
+<script>
+let Index = 0;
+const submitBTN = document.getElementById('submit');
+const ctnQtyInput = document.getElementById('container_qty'); // Assuming 'ctn_qty' is the ID of the container qty input
+const pcsQtyInput = document.getElementById('pieces_qty'); // Assuming 'pcs_qty' is the ID of the pieces qty input
+
+document.addEventListener("DOMContentLoaded", function () {
+  const tds = document.querySelectorAll('#editableTable .editables input, #editableTable .editables textarea');
+
+  tds[0].setAttribute("tabindex", "0");
+  tds[0].focus();
+
+  // Handle keypress event
+  document.addEventListener("keydown", function(event) {
+    const currentElement = document.activeElement;
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const currentIndex = Array.from(tds).indexOf(currentElement);
+      const nextIndex = currentIndex + 1;
+      if (nextIndex < tds.length) {
+        tds[nextIndex].setAttribute("tabindex", "0");
+        tds[nextIndex].focus();
+        currentElement.removeAttribute("tabindex");
+      } else {
+        //  trigger click on submit button
+        if (nextIndex == tds.length) {
+          submitBTN.click();
+        } 
+      }
+    }
+  });
+
+  // Adding event listener for the submit button
+  submitBTN.addEventListener('click', function(event) {
+    // Check validation before submitting
+    if (ctnQtyInput.value.trim() === '' || pcsQtyInput.value.trim() === '') {
+      event.preventDefault(); // Prevent default form submission
+      if (ctnQtyInput.value.trim() === '') {
+        document.getElementById('missing_field1').style.display = "block"
+      }
+      else{
+        document.getElementById('missing_field1').style.display = "none"
+      }
+      if(pcsQtyInput.value.trim() === '') {
+        document.getElementById('missing_field2').style.display = "block"
+      }
+      else {
+        document.getElementById('missing_field2').style.display = "none"
+      }
+    }
+  });
+});  
+</script>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<!-- Bootstrap -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<!-- Font Awesome -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">    
+
+<style>
+  .sso-button{
+    border: 1px solid #ccc;
+    border-radius: 5px ;
+    padding: 10px;
+    margin-bottom: 10px ;
+  }
+  .sso-button:hover {
+    background-color: lightgray;
+    cursor: pointer;
+  }
+</style>
+<div class="container justify-content-center align-items-center">
+        <div class="text-center">
+            <div class="text-muted h5 my-3">Login</div>
+        </div>
+        <div class="container p-4 bg-white shadow-lg rounded"; style="width: 35%;">
+            <form method="post" action="{{ url_for('login.login', next=next) }}">
+                {{ form.hidden_tag() }}
+
+                   <!-- ####### Flash message handling ######### -->
+                  {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div id="alert_message" class="alert alert-{{ category }} fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="closealert()">x</button>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                  {% endwith %}
+                  <!-- ####### Flash message handling ######### -->
+
+                <div class="form-group">
+                    {{ form.Username(class="form-control", placeholder="Username") }}
+                </div>
+                <div class="form-group">
+                    {{ form.Password(class="form-control", placeholder="Password") }}
+                </div>
+                <div class="text-center">
+                  <button class="btn btn-primary rounded-lg" id="submit" type="submit" value="Login">Login</button>
+                </div>
+            </form>
+            <hr>
+            <div class="text-center mt-3">
+                <p>Don't have an account? <a href="{{url_for('register.signup')}}" style="color: green;">Sign Up</a></p>
+                <hr>
+                <div class="sso-button">
+                  <img style="max-width: 1.2em;" src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo">
+                    <span><a class="text-dark" href="{{ url_for('google.login') }}">Continue with Google</a></span>
+                </div>
+                <div class="sso-button" onclick="window.location.href='#';">
+                    <img style="max-width: 1.2em;" src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub Logo">
+                    <span><a class="text-dark" href="#">Continue with GitHub</a></span>
+                </div>
+                <div class="sso-button" onclick="window.location.href='#';">
+                  <img style="max-width: 1.2em;" src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="GitHub Logo">
+                  <span><a class="text-dark" href="{{ url_for('login.auth0_login') }}">Continue with Auth0</a></span>
+              </div>
+            </div>
+        </div>
+</div>
+
+<script>
+  // function to close the flash alert 
+  function closealert() {
+    alert_div = document.getElementById('alert_message')
+    alert_div.style.display = 'None'
+  }
+</script>
+{%endblock%}

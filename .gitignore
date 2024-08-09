@@ -1,0 +1,26 @@
+# Ignore Python bytecode files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Ignore environment and configuration files
+instance/
+.flaskenv
+.env
+guri
+
+# Ignore temporary files and folders
+tempstuff/
+flask_session/
+*.log
+
+# Ignore migration files
+migrations/
+
+# Ignore specific directories
+app/__pycache__/
+blueprints/*/__pycache__/
+
+# Ignore specific files
+*.sqlite3  # if you're using SQLite
