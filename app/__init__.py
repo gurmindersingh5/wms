@@ -33,7 +33,7 @@ oauth = OAuth(app)
 auth0 = oauth.register(
     'auth0',
     client_id='RByXpzargl0vi7A197IYLZWrjiMRD6k1',
-    client_secret='inEQsSAOchxYrEObJb0kfQ8X9jn0vg30a_sMYLTb5r5B0CByqGwgImk5yoAawUs3',
+    client_secret='',
     api_base_url=f'https://dev-ide3i4bsx5n6mct1.us.auth0.com',
     access_token_url=f'https://dev-ide3i4bsx5n6mct1.us.auth0.com/oauth/token',
     authorize_url=f'https://dev-ide3i4bsx5n6mct1.us.auth0.com/authorize',

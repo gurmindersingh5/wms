@@ -7,7 +7,7 @@ from flask_login import LoginManager, login_user, current_user
 # Configure blueprints
 google_bp = make_google_blueprint(
     client_id='881083313643-u750fvjugm6sc0v2a675ubjdq7e5pkml.apps.googleusercontent.com',
-    client_secret='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',
+    client_secret='',
     scope=["profile", "email"] 
 )
 

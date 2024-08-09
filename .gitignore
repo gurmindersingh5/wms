@@ -9,6 +9,7 @@ instance/
 .flaskenv
 .env
 guri
+temp.py
 
 # Ignore temporary files and folders
 tempstuff/
