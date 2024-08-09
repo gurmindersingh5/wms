@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, redirect, url_for, session, flash
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_dance.contrib.github import make_github_blueprint, github
@@ -6,8 +8,8 @@ from flask_login import LoginManager, login_user, current_user
 
 # Configure blueprints
 google_bp = make_google_blueprint(
-    client_id='',
-    client_secret='',
+    client_id=os.environ.get(''),
+    client_secret=os.environ.get(''),
     scope=["profile", "email"] 
 )
 

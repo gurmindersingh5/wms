@@ -1,3 +1,5 @@
+import os
+
 from datetime import timedelta
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -9,7 +11,7 @@ from authlib.integrations.flask_client import OAuth
 
 app = Flask(__name__, static_url_path='/app/static')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-app.config['SECRET_KEY'] = "lovely17"
+app.config['SECRET_KEY'] = os.environ.get('super_secret')
 
 # config session in app
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -17,7 +19,7 @@ app.config['SESSION_PERMANENT'] = False  # Sessions won't expire on browser clos
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)  # Session timeout
 
 # Configure JWT settings
-app.config['JWT_SECRET_KEY'] = 'ABC123ABC123'  # Replace with your secret key
+app.config['JWT_SECRET_KEY'] = os.environ.get('jwt_token')  # Replace with your secret key
 jwt = JWTManager(app)
 
 Session(app)
@@ -32,11 +34,11 @@ login_manager.init_app(app)
 oauth = OAuth(app)
 auth0 = oauth.register(
     'auth0',
-    client_id='',
-    client_secret='',
-    api_base_url=f'https://dev-ide3i4bsx5n6mct1.us.auth0.com',
-    access_token_url=f'https://dev-ide3i4bsx5n6mct1.us.auth0.com/oauth/token',
-    authorize_url=f'https://dev-ide3i4bsx5n6mct1.us.auth0.com/authorize',
+    client_id=os.environ.get(''),
+    client_secret=os.environ.get(''),
+    api_base_url=os.environ.get(''),
+    access_token_url=os.environ.get(''),
+    authorize_url=os.environ.get(''),
     client_kwargs={
         'scope': 'openid profile email',
     },
