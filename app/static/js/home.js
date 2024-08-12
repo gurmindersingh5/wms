@@ -1,7 +1,8 @@
 // Sales by Customers (bar graph)
 const ctxPurchases = document.getElementById("purchases").getContext("2d");
 const names = document.getElementById('data').innerText.split(",");
-const prices = document.getElementById('price').innerText.split(",");
+// integer list of prices recieved as string by JS by default, so we need to convert it into object(array) using Json.parse
+const prices = JSON.parse(document.getElementById('price').innerText)
 
 const purchasesChart = new Chart(ctxPurchases, {
     type: "bar",
@@ -24,6 +25,7 @@ const purchasesChart = new Chart(ctxPurchases, {
                 },
                 ticks: {
                     color: "#495057",
+                    
                 }
             },
             x: {
@@ -32,6 +34,9 @@ const purchasesChart = new Chart(ctxPurchases, {
                 },
                 ticks: {
                     color: "#495057",
+                    callback: function(value) {
+                        return value.toLocaleString();
+                    }
                 }
             }
         },
@@ -40,7 +45,16 @@ const purchasesChart = new Chart(ctxPurchases, {
                 labels: {
                     color: "#495057",
                 }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(tooltipItem) {
+                        // Format numbers with commas in tooltips
+                        return tooltipItem.raw.toLocaleString();
+                    }
+                }
             }
+
         }
     }
 });

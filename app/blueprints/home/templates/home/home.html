@@ -15,73 +15,25 @@
 <a id="data" style="display: none;">{{data}}</a>
 <a id="price" style="display: none;">{{price}}</a>
 <div class="text-center justify-content-center w-100">
-    <!-- Top bar icon holder for calculator, bar and line chart -->
-    <div class="shadow p-0 mb-3 bg-light rounded">
-        <div class="icon-holder">
-            <i id="graphElem" class="fas fa-chart-line p-2" style="font-size: 28px; color: #333;"></i>
-            <i id="bargraphElem" class="fas fa-chart-bar p-2" style="font-size: 28px; color: #333;"></i>
-            <i id="calcElem" class="fas fa-calculator p-2" style="font-size: 28px; color: #333;"></i>
-        </div>
-    </div>
-
     <!-- Outer container of left and right div -->
-    <div class="d-flex justify-content-between text-center">
+    <div class="d-flex justify-content-between text-center w-100" style="height: 100vh;">
+        
 
-        <!-- Left side div -->
-        <div class="w-75">
-            <div class="chart p-5">
-                <!-- line graph -->
-                <div id="div1" class="chart-container mb-5">
-                    <canvas id="monthly-sales"></canvas>
-                </div>
-                <!-- bar graph -->
+            <!-- iframe -->
+            <iframe
+                class="w-100"
+                src="http://localhost:8050/"
+                frameborder="0"
+                style="height: 100%;" >
+            </iframe>
+        
+            <!-- <div class="w-100 ">
+
                 <div id="div2" class="chart-container mb-5">
                     <canvas id="purchases"></canvas>
                 </div>
+            </div> -->
 
-                <div id="div3">
-                    <div class="calculator-container">
-                        <div class="calculator">
-                            <input type="text" id="display" value="" disabled>
-                            <button onclick="appendToDisplay('7')">7</button>
-                            <button onclick="appendToDisplay('8')">8</button>
-                            <button onclick="appendToDisplay('9')">9</button>
-                            <button onclick="appendToDisplay('+')">+</button>
-                            <button onclick="appendToDisplay('4')">4</button>
-                            <button onclick="appendToDisplay('5')">5</button>
-                            <button onclick="appendToDisplay('6')">6</button>
-                            <button onclick="appendToDisplay('-')">-</button>
-                            <button onclick="appendToDisplay('1')">1</button>
-                            <button onclick="appendToDisplay('2')">2</button>
-                            <button onclick="appendToDisplay('3')">3</button>
-                            <button onclick="appendToDisplay('*')">*</button>
-                            <button onclick="appendToDisplay('0')">0</button>
-                            <button onclick="appendToDisplay('.')">.</button>
-                            <button onclick="clearDisplay()">C</button>
-                            <button onclick="calculateResult()">=</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right side div -->
-        <div class="w-25">
-            <div class="d-flex flex-column align-items-center">
-                <div class="clock-container">
-                    <div class="clock"></div>
-                    <div id="date" class="date"></div>
-                </div>
-                <div class="weather-container">
-                    <i class="weather-icon fas fa-cog"></i>
-                    <div class="weather-info">
-                        <div class="temperature">Fetching</div>
-                        <div class="description">weather data...</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
     </div>
 </div>
 
@@ -95,11 +47,9 @@
         const options = { day: 'numeric', month: 'short', year: 'numeric' };
         return date.toLocaleDateString('en-US', options);
     }
-    // Get current date
-    var date = new Date();
-    // Format the date
-    var formattedDate = formatDate(date);
     // Display the formatted date
+    var date = new Date(); 
+    var formattedDate = formatDate(date);
     document.getElementById('date').textContent = formattedDate;
 </script>
 {% endblock %}

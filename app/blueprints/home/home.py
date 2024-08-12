@@ -1,12 +1,12 @@
 import json
 
-from flask import Blueprint, render_template, request, jsonify
-from sqlalchemy import extract, and_, desc
 from datetime import datetime
+from flask import Blueprint, render_template, request, jsonify
+from sqlalchemy import extract, and_, desc, func
 
 from ... import app, db
 from ...models import DEntry, CEntry
-
+from ...thousand_seperator import thousand_seperator_func
 
 home_bp = Blueprint('home', __name__, template_folder='templates')
 
@@ -15,18 +15,37 @@ def home():
     '''
     Get the data from db for Highest Sales by Customer and Monthly Sales for JS Charts
     '''
-    '''NEED FIX'''
-    # Highest Sales by Customer
-    names = [items.name for items in CEntry.query.join(DEntry).order_by(desc(DEntry.price))]
-    prices = [int(items.price) for items in DEntry.query.all()]
-    prices = sorted(prices, reverse=True)
 
-    # Create string of list of names of highest puchases to send to graph in home page through home.js
+
+    # Highest Sales by Customer
+    '''
+    SELECT C.name, SUM(D.price) as total_purchases_amount
+    FROM DEntry D
+    JOIN CEntry C
+    ON D.cust_id = C.cust_id
+    GROUP BY C.cust_id
+    ORDER BY total_purchases_amount DESC
+    ;
+    '''
+    results = db.session.query(
+        CEntry.name, 
+        db.func.sum(DEntry.price).label('total_purchases_amount')
+    ).join(
+        DEntry, CEntry.cust_id == DEntry.cust_id
+    ).group_by(
+        CEntry.cust_id
+    ).order_by(
+        db.desc('total_purchases_amount')
+    ).all()
+    names = [item.name for item in results] 
+    prices = [float(item.total_purchases_amount) for item in results] 
+ 
+     # Create string of list of names of highest puchases to send to graph in home page through home.js
     names_str = ""
     price_str = ""
-    for name,price in zip(names,prices):
+    for name, price in zip(names, prices): 
         names_str += name[:15]+','
-        price_str += str(price)+','
+        price_str += str(price)+' '
 
     # Monthly Sales 
     Query_time = db.session.query(DEntry.time)
@@ -71,4 +90,32 @@ def home():
         if data['key'] == "montlySalesGraph":
             return jsonify({'monthly_sale':monthly_sale, 'months':months_for_monthly_sale})
 
-    return render_template('home/home.html', data=names_str, price=price_str)
+    return render_template('home/home.html', data=names_str, price=prices)
+
+
+
+@home_bp.route('/api/fetch_data', methods=['GET', 'POST'])
+def fetch_data():
+    '''
+    SELECT strftime('%Y-%m', time) as date_, SUM(price) as sales
+    FROM d_entry
+    GROUP BY strftime('%Y-%m', time);
+    '''
+
+    results = db.session.query(
+        func.strftime('%Y-%m', DEntry.time).label('year_month'),
+        func.sum(DEntry.price).label('monthly_sales')
+    ).group_by(
+	func.strftime('%Y-%m', DEntry.time)
+    ).all()
+    year_month = []
+    monthly_sales = []
+    for r in results:
+        y_m, m_s = r
+        year_month.append(y_m)
+        monthly_sales.append(int(m_s))
+
+    return jsonify({
+        'year_month': year_month,
+        'monthly_sales': monthly_sales
+        })
