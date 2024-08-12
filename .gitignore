@@ -22,5 +22,3 @@ migrations/
 app/__pycache__/
 blueprints/*/__pycache__/
 
-# Ignore specific files
-*.sqlite3  # if you're using SQLite
