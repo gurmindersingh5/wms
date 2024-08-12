@@ -5,7 +5,6 @@
 __pycache__/
 
 # Ignore environment and configuration files
-instance/
 .flaskenv
 .env
 guri
