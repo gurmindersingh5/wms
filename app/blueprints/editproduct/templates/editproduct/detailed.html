@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit inventory{% endblock %}
+
+{% block content %}
+<style>
+.edit-button {
+  background-color: #007bff; /* Button background color */
+  color: white; /* Text color */
+  border: none; /* Remove default button border */
+  padding: 5px 8px; /* Adjust padding */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Show pointer cursor on hover */
+  font-size: 13px;
+  align-items: center;
+}
+/* Style for the pencil icon */
+.pencil-icon {
+  margin-left: 5px; /* Adjust space between text and icon */
+  font-size: 14px; /* Adjust icon size */
+  transform: rotate(90deg);
+}
+table {
+  margin: 0 auto; /* Set left and right margins to auto */
+}
+table tr{
+    border-bottom: 2px solid   rgb(235, 232, 232);
+}
+</style>
+
+<div id="notification_e" style="display: none; padding: 10px; background-color: red; width: 150px; color: black; left: 0; right: 0; margin: auto; width: fit-content; border-radius: 5px; text-align: center; margin-top: 10px;">
+</div>
+<div id="notification" style="display: none; padding: 10px; background-color: rgba(35, 209, 35, 0.231) ; width: 150px; color: black; left: 0; right: 0; margin: auto; width: fit-content; border-radius: 5px; text-align: center; margin-top: 10px;">
+    Successfully updated!
+</div>
+<div id="notification_deletion" style="display: none; padding: 10px; background-color: rgba(35, 209, 35, 0.231) ; width: 150px; color: black; left: 0; right: 0; margin: auto; width: fit-content; border-radius: 5px; text-align: center; margin-top: 10px;">
+    Successfully Deleted!
+</div>
+<div class="justify-content-center d-flex">
+    <div class="p-4 w-75">
+        <a id="total_price" type="hidden" style="display: none;" >{{data.total_qty*data.price}} </a>  
+        <table id="editableTable"  style=" width:100%; background-color: white; font-size:larger; line-height: 1.8;">
+            <tr>
+                <td style="width: 250px; font-weight: bold;">Part ID: </td>
+                <td ><span class="editables" contenteditable="false" style=" padding: 2px; color: lightgray;">{{data.part_id}}</span>
+                &nbsp; </td>
+            </tr>
+            <tr>
+                <td style="width: 250px; font-weight: bold;">Product Name: </td>
+                <td><span class="editables" contenteditable="true" style=" padding: 2px; border: 2px dotted rgb(153, 165, 255);">{{data.name}}</span>
+                &nbsp; </td>
+            </tr>
+            <tr>
+                <td style="width: 250px; font-weight: bold;">Qty(CTN)</td>
+                <td><span class="editables" contenteditable="true" style=" padding: 2px; border: 2px dotted rgb(153, 165, 255);">{{data.container_qty}}</span>        </tr>
+            <tr>
+                <td style="width: 250px; font-weight: bold;">Qty(PCs): :</td>
+                <td><span class="editables" contenteditable="true" style=" padding: 2px; border: 2px dotted rgb(153, 165, 255);">{{data.pieces_qty}}</span>        </tr>
+            <tr>
+                <td style="width: 250px; font-weight: bold;">Price/Item: </td>
+                <td><span class="editables" contenteditable="true" style=" padding: 2px; border: 2px dotted rgb(153, 165, 255);">{{data.price}}</span>        </tr>
+            <tr>
+                <td style="width: 250px; font-weight: bold;">How many in 1 CTN: </td>
+                <td><span class="editables" contenteditable="true" style=" padding: 2px; border: 2px dotted rgb(153, 165, 255);">{{data.container_capacity}}</span>        </tr>
+        </table>
+        <div class="justify-content-center d-flex">
+            <div>
+                <button id="update" style="color: white; margin: 30px auto; padding: 10px; background-color: rgb(113, 176, 197); border-radius: 5px; border: 2px solid gray; border-left-width: 10px; border-right-width: 10px; cursor: pointer; ",  onmousedown="this.style.backgroundColor='rgb(24, 153, 196)'", onmouseleave="this.style.backgroundColor='rgb(113, 176, 197)'">Update</button>
+                <button id="delete" style="color: white; margin: 30px auto; padding: 10px; background-color: rgb(218, 35, 35); border-radius: 5px; border: 2px solid gray; border-left-width: 10px; border-right-width: 10px; cursor: pointer; margin-left: 10px; ", onmousedown="this.style.backgroundColor='rgb(165, 13, 13)'", onmouseleave="this.style.backgroundColor='rgb(218, 35, 35)'">Delete</button>
+                <button id="cancel" style="color: white; margin: 30px auto; padding: 10px; background-color: rgb(50, 206, 107); border-radius: 5px; border: 2px solid gray; border-left-width: 10px; border-right-width: 10px; cursor: pointer; margin-left: 10px; ", onmousedown="this.style.backgroundColor='rgb(15, 173, 73)'", onmouseleave="this.style.backgroundColor='rgb(50, 206, 107)'">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/jquery-3.6.4.min.js') }}"></script>
+<script> 
+    // Update button 
+    var updateBtn = document.getElementById('update');
+    var cancleBtn = document.getElementById('cancel');
+    var deleteBtn = document.getElementById('delete');
+
+    cancleBtn.addEventListener('click', function(){
+        window.location.href="/edit";
+    });
+    // script to get all row's data using classname of all rows, queryselector will save data in 
+    //object(Nodelist) and using forEach the itema are stored in a new list
+    updateBtn.addEventListener('click', function(){
+        var updatedData = []
+
+        document.querySelectorAll('.editables').forEach(function(item){
+            updatedData.push(item.textContent);
+        });
+    // Send updatedData to the server
+    fetch('/detailed', {
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 'updated_data': updatedData})
+        })
+        .then(response => {
+            // Handle response from the server
+            if (response.ok){
+                document.getElementById('notification').style.display = 'block';
+                // Hide notification after 2 seconds
+                setTimeout(() => {
+                    window.location.href="/edit"
+
+                }, 800);
+            }  else {
+            // Display error message in notification
+            response.text().then(errorMessage => {
+                document.getElementById('notification_e').style.display = 'block';
+                document.getElementById('notification_e').textContent = 'Invalid entries';
+                setTimeout(function() {
+                    document.getElementById('notification_e').style.display = 'none';
+                    document.getElementById('notification_e').textContent = '';
+                    }, 2000);
+                });
+            }
+        })
+        .catch(error => {
+            // Handle errors
+            console.error('Error:', error);
+        });
+    });
+    //script to listen delete button and trigger event
+    deleteBtn.addEventListener('click', function(){
+        if (confirm('Are you sure you want to DELETE this record?')) {
+            var totalPrice = document.getElementById('total_price').textContent
+            if (totalPrice > 0){
+                if (confirm('This product still has some QUANTITY. Do you still want to DELETE this product record? Doing this will PERMANENTLY delete this record and you can not retrieve it back!!!'))
+               sendDeleteCommandtoServer()                
+            } else {
+                sendDeleteCommandtoServer()
+            }
+        }  
+        });
+        // delete request function to server
+        function sendDeleteCommandtoServer() {
+            fetch('/detailed', {
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 'delete': 'true'})
+        })
+        .then(response => {
+            // Handle response from the server
+            if (response.ok){
+                document.getElementById('notification_deletion').style.display = 'block';
+      // Hide notification after 2 seconds
+      setTimeout(() => {
+        window.location.href="/edit"
+      }, 800);
+            }
+            console.log(response);
+        })
+        .catch(error => {
+            // Handle errors
+            console.error('Error:', error); 
+        });
+    };
+// SCRIPT TO MOVE FOCUS ON ENTER BUTTON PRESS
+//              starts here
+    $(document).ready(function () {
+    window.onload = function() {
+        var editableCells = document.querySelectorAll('#editableTable .editables');
+        if (editableCells.length > 0) {
+            editableCells[1].focus();
+        }
+    };
+    $('#editableTable .editables').keydown(function (e) {
+        var $this = $(this);
+        var $td = $this.closest('td');
+        var $tr = $td.closest('tr');
+
+        // Handle Enter key
+        if (e.keyCode === 13) { // Enter key
+            e.preventDefault();
+            var $nextTr = $tr.next('tr');
+            if ($nextTr.length) {
+                var $nextEditable = $nextTr.find('.editables').first();
+                $nextEditable.focus();
+            } else {
+                $('#update').show().focus();
+                if (confirm('Are you sure you want to update?')) {
+                    $('#update').click()
+                        }
+            }
+        }
+    });
+});
+// SCRIPT TO MOVE FOCUS ON ENTER BUTTON PRESS
+//              ENDS here
+</script>
+{%endblock%}

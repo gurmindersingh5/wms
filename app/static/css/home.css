@@ -1,0 +1,88 @@
+/* Calculator */
+.calculator-container {
+    width: auto;
+    height: auto;
+    align-self: center;
+    text-align: center;
+}
+
+.calculator {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    align-self: center;
+}
+
+.calculator button {
+    width: 100%;
+    padding: 10px;
+    font-size: 18px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+input {
+    grid-column: span 4;
+    padding: 10px;
+    font-size: 24px;
+    text-align: right;
+    border: none;
+    border-radius: 5px;
+    background-color:aliceblue;
+}
+
+
+/* Weather and clock */
+.weather-container {
+display: flex;
+align-items: center;
+margin-top: 20px;
+}
+
+.weather-info {
+margin-left: 10px;
+}
+
+.clock-container {
+display: flex;
+flex-direction: column; /* Arrange children in a column */
+align-items: center; /* Center horizontally */
+background-color: transparent;
+color: #040404;
+width: 70%;
+height: auto;
+padding: 10px;
+border-radius: 15px;
+margin-top: 5rem;
+font-size: 2rem;
+border: solid 2px white;
+box-shadow: 0 0 1px 1px;
+transition: .1s;
+}
+
+.clock-container:hover {
+box-shadow: 0 0 1px 1px;
+background-color: whitesmoke;
+}
+
+.clock {
+color: rgb(33, 5, 69);
+}
+
+.date {
+font-size: 14px;
+color: #666;
+}

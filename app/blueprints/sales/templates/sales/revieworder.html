@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Order List</h1>
+    <div style="display: flex; align-items: center;"> <h3 style="color: blue;">Party name: &nbsp; </h3><a id="cust-name"></a> </div>
+
+    <table id="orderTable">
+        <thead>
+            <tr>
+                <th>S.No.</th>
+                <th>Part ID</th>
+                <th>Part Name</th>
+                <th>Container Qty</th>
+                <th>Pieces Qty</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody id="orderListBody">
+            <!-- Data will be populated here -->
+        </tbody>
+    </table>
+    <br>
+    <a style="font-weight: bold; color: green;">Grand Total: &nbsp;</a><a id="total" style="font-weight: bold;"></a>
+
+    <script>
+        // Retrieve orderList data from query parameter, localStorage, or sessionStorage
+        const queryParams = new URLSearchParams(window.location.search);
+        const dataString = queryParams.get('data');
+        const decodedDataString = decodeURIComponent(dataString);
+        const data = JSON.parse(decodedDataString);
+
+        const orderList = data.orderList;
+        const customerData = data.customerData;
+
+        document.getElementById('cust-name').textContent = customerData.name + ', ' + customerData.address + ', ' + customerData.contact;
+
+        // Function to populate the table with orderList data
+        function populateOrderList() {
+            const orderListBody = document.getElementById('orderListBody');
+
+            // Clear existing rows
+            orderListBody.innerHTML = '';
+            total = 0;
+            // Populate table with orderList data
+            orderList.forEach(row => {
+                total += row[6];
+                const tr = document.createElement('tr');
+                Object.values(row).forEach(value => {
+                    const td = document.createElement('td');
+                    td.textContent = value;
+                    tr.appendChild(td);
+                     
+                });
+                orderListBody.appendChild(tr);
+            });
+            document.getElementById('total').textContent = total;
+        }
+
+        // Call the function to populate the table
+        populateOrderList();
+    </script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}New Customer{% endblock %}
+
+{% block content %}
+<style>
+#cform {
+    color: white;
+    background-color:  rgb(85, 85, 85);
+}
+#submit {
+    color: white; 
+    background-color: rgb(50, 206, 107); 
+    height:40px; width:180px; 
+    font-size:18px; 
+    border-radius: 5px; 
+    border: 2px solid gray; 
+    border-left-width: 10px; 
+    border-right-width: 10px; 
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+#submit:hover {
+    background-color: rgb(43, 169, 89);
+}
+</style>
+    
+<div class="d-flex w-100 justify-content-center mt-4">
+    <div class="container w-75" style="text-align:left; padding-top: 10px">
+
+        <form method="POST">
+        {{form.hidden_tag()}}
+            <table id="editableTable">
+                <tr>
+                    <td>
+                        <div style="margin-bottom: 10px">
+                            {{form.name.label(style="width: 100px; font-weight: bold; color: black;")}}
+                        </div>
+                    </td>
+                    <td class="editables" >
+                        <div   style="margin-bottom: 10px">
+                            {{form.name(style="font-size: 20px; width:600px; font-weight: normal; ")}}
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="margin-bottom: 10px">
+                            {{form.address.label(style="width: 100px; font-weight: bold; color: black;")}}
+                        </div>
+                    </td>
+                    <td class="editables">
+                        <div style="margin-bottom: 10px; ">
+                            {{form.address(style="font-size: 20px; min-height: 120px; width:500px; ")}}
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="margin-bottom: 10px">
+                            {{form.contact.label(style="width: 100px; font-weight: bold; color: black;")}}
+                        </div>
+                    </td>
+                    <td class="editables">
+                        <div style="margin-bottom: 10px">
+                            {{form.contact(style="font-size: 20px; width:200px; min-height:30px")}}
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="editables">
+                        <div style="margin-bottom: 10px; text-align: center;">
+                            <input type="submit" id="submit" >
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+                
+        </form>
+
+            <div style="display: flex; justify-content: center; align-items: center; margin-top: 30px;">
+                <div id="div_note" class="div-note" style="text-align: center;">
+                    <a style="color: green;">Success:-</a> &nbsp; Customer: <a>{{success_note[0]}}, {{success_note[1]}} </a> was saved in the database. Dated: <a>{{success_note[3]}} </a>
+                </div>
+            </div>
+
+    </div>
+</div>
+<script>
+    
+let Index = 0;
+const submitBTN = document.getElementById('submit');
+
+document.addEventListener("DOMContentLoaded", function () {
+  const tds = document.querySelectorAll('#editableTable .editables input, #editableTable .editables textarea');
+
+  tds[0].setAttribute("tabindex", "0");
+  tds[0].focus();
+
+  // Handle keypress event
+  document.addEventListener("keydown", function(event) {
+    const currentElement = document.activeElement;
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const currentIndex = Array.from(tds).indexOf(currentElement);
+      const nextIndex = currentIndex + 1;
+      
+      if (nextIndex < tds.length) {
+        tds[nextIndex].setAttribute("tabindex", "0");
+        tds[nextIndex].focus();
+        currentElement.removeAttribute("tabindex");
+      } else {
+        //  trigger click on submit button
+        if (nextIndex == tds.length) {
+          submitBTN.click();
+        } 
+      }
+    }
+  });
+});
+</script>
+{% endblock %}
+
+

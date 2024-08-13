@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Home Page{% endblock %}
+
+{% block content %}
+
+<!-- Custom CSS import-->
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home.css') }}">
+<style>
+#home {
+    color: white;
+    background-color:  rgb(85, 85, 85);
+}
+</style>
+<a id="data" style="display: none;">{{data}}</a>
+<a id="price" style="display: none;">{{price}}</a>
+<div class="text-center justify-content-center w-100">
+    <!-- Outer container of left and right div -->
+    <div class="d-flex justify-content-between text-center w-100" style="height: 100vh;">
+        <iframe class="w-100" src="{{ url_for('dashapp.index') }}" frameborder="0"></iframe>
+    </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js"></script>
+<script src="{{ url_for('static', filename='js/jquery-3.6.4.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+
+<script>
+    // Function to format the date
+    function formatDate(date) {
+        const options = { day: 'numeric', month: 'short', year: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+    }
+    // Display the formatted date
+    var date = new Date(); 
+    var formattedDate = formatDate(date);
+    document.getElementById('date').textContent = formattedDate;
+</script>
+{% endblock %}
