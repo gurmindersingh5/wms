@@ -102,3 +102,9 @@ class Invoice(db.Model):
         return f"Invoice Number: {self.invoice_number}"
 
 
+class Visits(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    ip_addr = db.Column(db.String(20), nullable=False)
+
+    def __repr__(self) -> str:
+        return f"ip address: {self.ip_addr}"

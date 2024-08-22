@@ -8,9 +8,22 @@ from sqlalchemy import extract, and_, desc, func
 from ... import db
 from ...models import DEntry, CEntry
 from ...thousand_seperator import thousand_seperator_func
+from ...logs import visitor_counter
 
+# logsdir = os.path.abspath(os.path.join("app", "logs"))
+# print(logsdir)
+# logging.basicConfig(
+#     level=logging.DEBUG,
+#     format='%(asctime)s - %(message)s',
+#     handlers=[
+#         logging.FileHandler(os.path.join(logsdir, "app_access_log_file.log")),  # Log to a file
+#         logging.StreamHandler() # Log to console (stdout)
+#     ]
+# )
+# logger = logging.getLogger(__name__)
 
 home_bp = Blueprint('home', __name__, template_folder='templates')
+
 
 @home_bp.route('/', methods=['GET', 'POST'])
 def home():
@@ -29,6 +42,11 @@ def home():
     ORDER BY total_purchases_amount DESC
     ;
     '''
+    save_ip = visitor_counter.save_ip_addr(request.remote_addr)
+    visits = visitor_counter.visitor_counter_func()
+    if save_ip['status'] == 200:
+        visits += 1
+        
     results = db.session.query(
         CEntry.name, 
         db.func.sum(DEntry.price).label('total_purchases_amount')
@@ -92,7 +110,7 @@ def home():
         if data['key'] == "montlySalesGraph":
             return jsonify({'monthly_sale':monthly_sale, 'months':months_for_monthly_sale})
 
-    return render_template('home/home.html', data=names_str, price=prices)
+    return render_template('home/home.html', data=names_str, price=prices, visits=visits)
 
 
 

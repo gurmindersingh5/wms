@@ -15,6 +15,11 @@
 <a id="data" style="display: none;">{{data}}</a>
 <a id="price" style="display: none;">{{price}}</a>
 <div class="text-center justify-content-center w-100">
+    <div class="d-flex justify-content-end w-100" style="  text-align:right">
+        <div class="bg-light px-2">
+            Visits: {{visits}}
+        </div>
+    </div>
     <!-- Outer container of left and right div -->
     <div class="d-flex justify-content-between text-center w-100" style="height: 100vh;">
         <iframe class="w-100" src="{{ url_for('dashapp.index') }}" frameborder="0"></iframe>
