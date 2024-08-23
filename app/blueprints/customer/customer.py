@@ -23,7 +23,7 @@ def customerlist():
             if request.json['custId']:
                 global C_ID_FOR_customerdata
                 C_ID_FOR_customerdata = request.json['custId']
-                return redirect(url_for('customerdata_'))
+                return redirect(url_for('customer.customerdata_'))
         except Exception as e:
             print(str(e))
 
