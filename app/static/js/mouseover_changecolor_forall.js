@@ -7,6 +7,7 @@ for (var i = 0; i < listofItems.length; i++) {
     listofItems[i].addEventListener('mouseover', function () {
       this.style.backgroundColor = "#e09e7d";
       this.style.color = "white";
+      this.style.cursor = "pointer";
     });
 
     listofItems[i].addEventListener('mouseout', function () {
