@@ -1,1 +1,10 @@
-d
+flask
+flask_dance 
+authlib 
+flask_login 
+flask_migrate 
+flask_jwt_extended 
+flask_session  
+requests
+flask_wtf
+dash
